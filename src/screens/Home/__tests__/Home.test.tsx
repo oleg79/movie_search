@@ -5,7 +5,7 @@ import renderer from 'react-test-renderer';
 import successResponse from '../__mocks__/successResponse.json';
 import failResponse from '../__mocks__/failResponse.json';
 
-import Home from '../Home';
+import Home from '../';
 
 const generateFetch = (rawJsonResponse: string) => {
   // @ts-ignore
