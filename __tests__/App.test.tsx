@@ -1,7 +1,3 @@
-/**
- * @format
- */
-
 import 'react-native';
 import React from 'react';
 import Config from 'react-native-config'
