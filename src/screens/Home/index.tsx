@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Text,
   TextInput,
@@ -10,24 +11,31 @@ import Config from 'react-native-config'
 
 import {Video, VideoCard} from '../../components/VideoCard';
 
-import { ApiResponse } from './types';
 import { isSuccessResponse, isFailResponse } from './helpers';
 
 import styles from './Home.styles'
 
 interface State {
+  page: number;
   searchText: string;
   showEmptySearchWarning: boolean;
-  searching: boolean;
-  response: ApiResponse;
+  loading: boolean;
+  loadingMore: boolean;
+  data: Video[];
+  error: string | null;
+  totalResults: number;
 }
 
 export default class Home extends React.PureComponent<{}, State> {
   state = {
+    page: 1,
     searchText: '',
     showEmptySearchWarning: false,
-    searching: false,
-    response: null,
+    loading: false,
+    loadingMore: false,
+    data: [],
+    error: null,
+    totalResults: 0,
   };
 
   handleSearchTextChange: (searchText: string) => void = searchText => {
@@ -41,7 +49,14 @@ export default class Home extends React.PureComponent<{}, State> {
     const searchText = this.state.searchText.trim();
 
     if (searchText) {
-      this.search(searchText);
+      this.setState({
+        page: 1,
+        data: [],
+        loading: true,
+      }, () => {
+        this.search();
+      });
+
     } else {
       this.setState({
         showEmptySearchWarning: true
@@ -49,21 +64,59 @@ export default class Home extends React.PureComponent<{}, State> {
     }
   };
 
-  search: (searchText: string) => void = async searchText => {
-    const rawResponse = await fetch(`${Config.API_URL}/?apikey=${Config.API_KEY}&s=${searchText}`);
+  search: () => void = async () => {
+    const { page, searchText } = this.state;
+    const rawResponse = await fetch(
+      `${Config.API_URL}/?apikey=${Config.API_KEY}&s=${searchText.trim()}&page=${page}`
+    );
     const response = await rawResponse.json();
-    console.log(response);
-    this.setState({ response })
+
+    if (isSuccessResponse(response)) {
+      this.setState(() => ({
+        data: page === 1 ? response.Search : [ ...this.state.data, ...response.Search ],
+        totalResults: parseInt(response.totalResults, 10),
+        loading: false,
+        loadingMore: false,
+      }));
+    } else if (isFailResponse(response)) {
+      this.setState({
+        error: response.Error,
+        totalResults: 0,
+        loading: false,
+        loadingMore: false,
+      });
+    }
+
   };
 
   _renderItem = ({item}:{item: Video}) => <VideoCard video={item}/>;
 
   _keyExtractor: (item: Video) => string = (item: Video) => item.imdbID;
 
+  _loadMoreVideos: () => void = () => {
+    if (this.state.totalResults !== this.state.data.length) {
+      this.setState((prevState) => ({
+        page: prevState.page + 1,
+        loadingMore: true,
+      }), () => {
+        this.search();
+      });
+    }
+  };
+
+  _renderListFooter = () => {
+    if (!this.state.loadingMore) {
+      return null;
+    }
+
+    return (
+      <View>
+        <ActivityIndicator animating size='large' />
+      </View>
+    );
+  };
+
   render() {
-
-    const { response } = this.state;
-
     return (
       <View style={styles.root}>
         <TextInput
@@ -74,23 +127,25 @@ export default class Home extends React.PureComponent<{}, State> {
           <Text>Search</Text>
         </TouchableOpacity>
 
+        <Text>Videos were found: { this.state.totalResults }</Text>
+
         { this.state.showEmptySearchWarning &&
           <Text>Please enter the title</Text>
         }
 
-        { isSuccessResponse(this.state.response) &&
-          <FlatList
-            // @ts-ignore
-            data={response.Search}
-            renderItem={this._renderItem}
-            keyExtractor={this._keyExtractor}
-            initialNumToRender={4}
-          />
-        }
+        <FlatList
+          data={this.state.data}
+          renderItem={this._renderItem}
+          keyExtractor={this._keyExtractor}
+          initialNumToRender={4}
+          onEndReachedThreshold={0.5}
+          onEndReached={this._loadMoreVideos}
+          ListFooterComponent={this._renderListFooter}
+        />
 
-        { isFailResponse(response) &&
+        { this.state.error &&
           <View>
-            <Text>{ response.Error }</Text>
+            <Text>{ this.state.error }</Text>
           </View>
         }
       </View>

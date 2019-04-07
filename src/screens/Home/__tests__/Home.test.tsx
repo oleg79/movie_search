@@ -41,10 +41,14 @@ describe('<Home/> component', () => {
 
   it('Should have a proper initial state', () => {
     expect(instance.state).toMatchObject({
+      page: 1,
       searchText: '',
       showEmptySearchWarning: false,
-      searching: false,
-      response: null,
+      loading: false,
+      data: [],
+      error: null,
+      totalResults: 0,
+      loadingMore: false,
     });
   });
 
@@ -70,16 +74,52 @@ describe('<Home/> component', () => {
   it('Should handle successful keyword search properly', async () => {
     generateFetch(JSON.stringify(successResponse));
     instance.handleSearchTextChange('some text');
-    await instance.search('some text');
-    expect(instance.state.response).toMatchObject(successResponse);
+
+    await (async () => {
+      instance.handleSearchPress();
+      expect(instance.state.loading).toBe(true);
+    })();
+
+
+    expect(instance.state.data).toMatchObject(successResponse.Search);
+    expect(instance.state.loading).toBe(false);
   });
 
 
   it('Should handle failed keyword search properly', async () => {
     generateFetch(JSON.stringify(failResponse));
     instance.handleSearchTextChange('some text');
-    await instance.search('some text');
-    expect(instance.state.response).toMatchObject(failResponse);
+
+    await (async () => {
+      instance.handleSearchPress();
+      expect(instance.state.loading).toBe(true);
+    })();
+
+    expect(instance.state.error).toBeTruthy();
+    expect(instance.state.loading).toBe(false);
+  });
+
+
+  it('Should load more videos properly', async () => {
+    generateFetch(JSON.stringify(successResponse));
+    instance.handleSearchTextChange('some text');
+
+    await instance.search();
+
+    expect(instance.state.data.length).toBe(2);
+    expect(instance.state.totalResults).toBe(4);
+
+    await (async () => {
+      instance._loadMoreVideos();
+      expect(instance.state.page).toBe(2);
+    })();
+
+    expect(instance.state.data.length).toBe(4);
+
+    await (async () => {
+      instance._loadMoreVideos();
+      expect(instance.state.page).toBe(2);
+    })();
   });
 
 });
