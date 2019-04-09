@@ -2,18 +2,23 @@ import * as React from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Text,
   TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
-import Config from 'react-native-config'
+import Config from 'react-native-config';
 
+import { SearchParamsContext } from '../../providers/SearchParamsProvider';
 import {Video, VideoCard} from '../../components/VideoCard';
 
 import { isSuccessResponse, isFailResponse } from './helpers';
 
 import styles from './Home.styles'
+
+type ScrollDirection = 'up' | 'down' | null;
 
 interface State {
   page: number;
@@ -24,19 +29,28 @@ interface State {
   data: Video[];
   error: string | null;
   totalResults: number;
+  scrollDirection: ScrollDirection;
 }
 
+export const defaultState: State = {
+  page: 1,
+  searchText: '',
+  showEmptySearchWarning: false,
+  loading: false,
+  loadingMore: false,
+  data: [],
+  error: null,
+  totalResults: 0,
+  scrollDirection: null,
+};
+
 export default class Home extends React.PureComponent<{}, State> {
-  state = {
-    page: 1,
-    searchText: '',
-    showEmptySearchWarning: false,
-    loading: false,
-    loadingMore: false,
-    data: [],
-    error: null,
-    totalResults: 0,
-  };
+  static contextType = SearchParamsContext;
+  context!: React.ContextType<typeof SearchParamsContext>;
+
+  offset: number = 0;
+
+  state = defaultState;
 
   handleSearchTextChange: (searchText: string) => void = searchText => {
     this.setState({
@@ -66,9 +80,15 @@ export default class Home extends React.PureComponent<{}, State> {
 
   search: () => void = async () => {
     const { page, searchText } = this.state;
-    const rawResponse = await fetch(
-      `${Config.API_URL}/?apikey=${Config.API_KEY}&s=${searchText.trim()}&page=${page}`
-    );
+    const { year, type, isActive } = this.context;
+
+    let uri = `${Config.API_URL}/?apikey=${Config.API_KEY}&s=${searchText.trim()}&page=${page}`;
+
+    if (isActive) {
+      uri += `&y=${year}${type ? '&type=' + type : ''}`;
+    }
+
+    const rawResponse = await fetch(uri);
     const response = await rawResponse.json();
 
     if (isSuccessResponse(response)) {
@@ -89,11 +109,11 @@ export default class Home extends React.PureComponent<{}, State> {
 
   };
 
-  _renderItem = ({item}:{item: Video}) => <VideoCard video={item}/>;
+  renderItem = ({item}:{item: Video}) => <VideoCard video={item}/>;
 
-  _keyExtractor: (item: Video) => string = (item: Video) => item.imdbID;
+  keyExtractor: (item: Video) => string = (item: Video) => item.imdbID;
 
-  _loadMoreVideos: () => void = () => {
+  loadMoreVideos: () => void = () => {
     if (this.state.totalResults !== this.state.data.length) {
       this.setState((prevState) => ({
         page: prevState.page + 1,
@@ -104,7 +124,7 @@ export default class Home extends React.PureComponent<{}, State> {
     }
   };
 
-  _renderListFooter = () => {
+  renderListFooter = () => {
     if (!this.state.loadingMore) {
       return null;
     }
@@ -116,36 +136,68 @@ export default class Home extends React.PureComponent<{}, State> {
     );
   };
 
+  handleListOnScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void = ({ nativeEvent }) => {
+    const currentOffset: number = nativeEvent.contentOffset.y;
+
+    this.setState(() => ({
+      scrollDirection: this.state.totalResults > 10 && (currentOffset > 400) && (currentOffset > this.offset) ? 'down' : 'up',
+    }), () => {
+      this.offset = currentOffset;
+    });
+  };
+
   render() {
+    const {
+      totalResults,
+      data,
+      showEmptySearchWarning,
+      error,
+    } = this.state;
+
     return (
       <View style={styles.root}>
-        <TextInput
-          placeholder='Enter movie title'
-          onChangeText={this.handleSearchTextChange}
-        />
-        <TouchableOpacity onPress={this.handleSearchPress}>
-          <Text>Search</Text>
-        </TouchableOpacity>
+        { this.state.scrollDirection !== 'down' &&
+          <View>
+            <TextInput
+              placeholder='Enter movie title'
+              onChangeText={this.handleSearchTextChange}
+              style={styles.search}
+            />
+            <TouchableOpacity onPress={this.handleSearchPress}>
+              <Text style={styles.searchButton}>Search</Text>
+            </TouchableOpacity>
+          </View>
+        }
 
-        <Text>Videos were found: { this.state.totalResults }</Text>
 
-        { this.state.showEmptySearchWarning &&
-          <Text>Please enter the title</Text>
+        { Boolean(totalResults) &&
+          <View style={styles.resultInfoContainer}>
+            <Text style={styles.resultInfo}>
+              {data.length} results of { totalResults } are loaded
+            </Text>
+          </View>
+        }
+
+        { showEmptySearchWarning &&
+          <View>
+            <Text>Please enter the title</Text>
+          </View>
         }
 
         <FlatList
-          data={this.state.data}
-          renderItem={this._renderItem}
-          keyExtractor={this._keyExtractor}
-          initialNumToRender={4}
+          data={data}
+          renderItem={this.renderItem}
+          keyExtractor={this.keyExtractor}
+          initialNumToRender={3}
           onEndReachedThreshold={0.5}
-          onEndReached={this._loadMoreVideos}
-          ListFooterComponent={this._renderListFooter}
+          onEndReached={this.loadMoreVideos}
+          ListFooterComponent={this.renderListFooter}
+          onScroll={this.handleListOnScroll}
         />
 
-        { this.state.error &&
+        { error &&
           <View>
-            <Text>{ this.state.error }</Text>
+            <Text>{ error }</Text>
           </View>
         }
       </View>

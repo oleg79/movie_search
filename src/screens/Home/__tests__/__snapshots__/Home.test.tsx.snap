@@ -9,36 +9,34 @@ exports[`<Home/> component Should be rendered properly 1`] = `
     }
   }
 >
-  <TextInput
-    allowFontScaling={true}
-    onChangeText={[Function]}
-    placeholder="Enter movie title"
-    rejectResponderTermination={true}
-    underlineColorAndroid="transparent"
-  />
-  <View
-    accessible={true}
-    isTVSelectable={true}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      Object {
-        "opacity": 1,
+  <View>
+    <TextInput
+      allowFontScaling={true}
+      onChangeText={[Function]}
+      placeholder="Enter movie title"
+      rejectResponderTermination={true}
+      underlineColorAndroid="transparent"
+    />
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "opacity": 1,
+        }
       }
-    }
-  >
-    <Text>
-      Search
-    </Text>
+    >
+      <Text>
+        Search
+      </Text>
+    </View>
   </View>
-  <Text>
-    Videos were found: 
-    0
-  </Text>
   <RCTScrollView
     ListFooterComponent={[Function]}
     data={Array []}

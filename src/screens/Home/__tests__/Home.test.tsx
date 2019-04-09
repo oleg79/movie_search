@@ -5,7 +5,7 @@ import renderer from 'react-test-renderer';
 import successResponse from '../__mocks__/successResponse.json';
 import failResponse from '../__mocks__/failResponse.json';
 
-import Home from '../';
+import Home, { defaultState } from '../';
 
 const generateFetch = (rawJsonResponse: string) => {
   // @ts-ignore
@@ -40,16 +40,7 @@ describe('<Home/> component', () => {
 
 
   it('Should have a proper initial state', () => {
-    expect(instance.state).toMatchObject({
-      page: 1,
-      searchText: '',
-      showEmptySearchWarning: false,
-      loading: false,
-      data: [],
-      error: null,
-      totalResults: 0,
-      loadingMore: false,
-    });
+    expect(instance.state).toMatchObject(defaultState);
   });
 
 
@@ -110,14 +101,14 @@ describe('<Home/> component', () => {
     expect(instance.state.totalResults).toBe(4);
 
     await (async () => {
-      instance._loadMoreVideos();
+      instance.loadMoreVideos();
       expect(instance.state.page).toBe(2);
     })();
 
     expect(instance.state.data.length).toBe(4);
 
     await (async () => {
-      instance._loadMoreVideos();
+      instance.loadMoreVideos();
       expect(instance.state.page).toBe(2);
     })();
   });
