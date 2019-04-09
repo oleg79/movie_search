@@ -1,34 +1,113 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<VideoCard /> component Should be rendered properly 1`] = `
-<View>
-  <Text>
-    Cool Runnings
-  </Text>
-  <Image
-    defaultSource={
-      Object {
-        "testUri": "../../../src/images/not_available.png",
-      }
+<View
+  style={
+    Object {
+      "alignSelf": "center",
+      "display": "flex",
+      "flexDirection": "row",
+      "marginVertical": 10,
+      "paddingVertical": 10,
+      "width": "90%",
     }
-    source={
-      Object {
-        "uri": "https://m.media-amazon.com/images/M/MV5BMjMxMTQ3MzMwMV5BMl5BanBnXkFtZTgwNTYxNzYxMTE@._V1_SX300.jpg",
+  }
+>
+  <View>
+    <Image
+      defaultSource={
+        Object {
+          "testUri": "../../../src/images/not_available.png",
+        }
       }
-    }
+      source={
+        Object {
+          "uri": "https://m.media-amazon.com/images/M/MV5BMjMxMTQ3MzMwMV5BMl5BanBnXkFtZTgwNTYxNzYxMTE@._V1_SX300.jpg",
+        }
+      }
+      style={
+        Object {
+          "height": 200,
+          "resizeMode": "contain",
+          "width": 180,
+        }
+      }
+    />
+  </View>
+  <View
     style={
       Object {
-        "height": 200,
-        "resizeMode": "contain",
-        "width": 200,
+        "display": "flex",
+        "justifyContent": "space-evenly",
       }
     }
-  />
-  <Text>
-    1993
-  </Text>
-  <Text>
-    movie
-  </Text>
+  >
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#37474f",
+            "fontSize": 12,
+          }
+        }
+      >
+        title:
+      </Text>
+      <Text
+        style={
+          Object {
+            "flex": 1,
+            "flexWrap": "wrap",
+            "width": 150,
+          }
+        }
+      >
+        Cool Runnings
+      </Text>
+    </View>
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#37474f",
+            "fontSize": 12,
+          }
+        }
+      >
+        year:
+      </Text>
+      <Text>
+        1993
+      </Text>
+    </View>
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#37474f",
+            "fontSize": 12,
+          }
+        }
+      >
+        type:
+      </Text>
+      <Text
+        style={
+          Object {
+            "backgroundColor": "#e53935",
+            "borderRadius": 10,
+            "color": "#fff",
+            "marginTop": 5,
+            "overflow": "hidden",
+            "padding": 2,
+            "textAlign": "center",
+            "width": 60,
+          }
+        }
+      >
+        movie
+      </Text>
+    </View>
+  </View>
 </View>
 `;

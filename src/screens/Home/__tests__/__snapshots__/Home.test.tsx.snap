@@ -5,7 +5,6 @@ exports[`<Home/> component Should be rendered properly 1`] = `
   style={
     Object {
       "flex": 1,
-      "paddingTop": 40,
     }
   }
 >
@@ -15,7 +14,16 @@ exports[`<Home/> component Should be rendered properly 1`] = `
       onChangeText={[Function]}
       placeholder="Enter movie title"
       rejectResponderTermination={true}
+      style={
+        Object {
+          "alignSelf": "center",
+          "fontSize": 20,
+          "paddingVertical": 10,
+          "width": "90%",
+        }
+      }
       underlineColorAndroid="transparent"
+      value=""
     />
     <View
       accessible={true}
@@ -32,7 +40,20 @@ exports[`<Home/> component Should be rendered properly 1`] = `
         }
       }
     >
-      <Text>
+      <Text
+        style={
+          Object {
+            "alignSelf": "center",
+            "backgroundColor": "#e53935",
+            "color": "#fff",
+            "fontSize": 15,
+            "fontWeight": "bold",
+            "paddingVertical": 12,
+            "textAlign": "center",
+            "width": "90%",
+          }
+        }
+      >
         Search
       </Text>
     </View>
@@ -44,7 +65,7 @@ exports[`<Home/> component Should be rendered properly 1`] = `
     getItem={[Function]}
     getItemCount={[Function]}
     horizontal={false}
-    initialNumToRender={4}
+    initialNumToRender={3}
     keyExtractor={[Function]}
     maxToRenderPerBatch={10}
     numColumns={1}
