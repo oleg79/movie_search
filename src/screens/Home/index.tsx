@@ -161,6 +161,7 @@ export default class Home extends React.PureComponent<{}, State> {
             <TextInput
               placeholder='Enter movie title'
               onChangeText={this.handleSearchTextChange}
+              value={this.state.searchText}
               style={styles.search}
             />
             <TouchableOpacity onPress={this.handleSearchPress}>
