@@ -10,6 +10,7 @@ import {
   View
 } from 'react-native';
 import Config from 'react-native-config';
+import axios from 'axios';
 
 import { SearchParamsContext } from '../../providers/SearchParamsProvider';
 import {Video, VideoCard} from '../../components/VideoCard';
@@ -29,7 +30,6 @@ interface State {
   data: Video[];
   error: string | null;
   totalResults: number;
-  scrollDirection: ScrollDirection;
 }
 
 export const defaultState: State = {
@@ -41,7 +41,6 @@ export const defaultState: State = {
   data: [],
   error: null,
   totalResults: 0,
-  scrollDirection: null,
 };
 
 export default class Home extends React.PureComponent<{}, State> {
@@ -89,23 +88,27 @@ export default class Home extends React.PureComponent<{}, State> {
       uri += `&y=${year}${type ? '&type=' + type : ''}`;
     }
 
-    const rawResponse = await fetch(uri);
-    const response = await rawResponse.json();
-
-    if (isSuccessResponse(response)) {
-      this.setState(() => ({
-        data: page === 1 ? response.Search : [ ...this.state.data, ...response.Search ],
-        totalResults: parseInt(response.totalResults, 10),
-        loading: false,
-        loadingMore: false,
-      }));
-    } else if (isFailResponse(response)) {
-      this.setState({
-        error: response.Error,
-        totalResults: 0,
-        loading: false,
-        loadingMore: false,
-      });
+    try {
+      const { data: response } = await axios.get(uri);
+      console.log(response);
+      if (isSuccessResponse(response)) {
+        this.setState(() => ({
+          data: page === 1 ? response.Search : [ ...this.state.data, ...response.Search ],
+          totalResults: parseInt(response.totalResults, 10),
+          loading: false,
+          loadingMore: false,
+          error: null,
+        }));
+      } else if (isFailResponse(response)) {
+        this.setState({
+          error: response.Error,
+          totalResults: 0,
+          loading: false,
+          loadingMore: false,
+        });
+      }
+    } catch (e) {
+      this.setState({ error: e.message });
     }
 
   };
@@ -137,16 +140,6 @@ export default class Home extends React.PureComponent<{}, State> {
     );
   };
 
-  handleListOnScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void = ({ nativeEvent }) => {
-    const currentOffset: number = nativeEvent.contentOffset.y;
-
-    this.setState(() => ({
-      scrollDirection: this.state.totalResults > 10 && (currentOffset > 400) && (currentOffset > this.offset) ? 'down' : 'up',
-    }), () => {
-      this.offset = currentOffset;
-    });
-  };
-
   render() {
     const {
       totalResults,
@@ -157,19 +150,17 @@ export default class Home extends React.PureComponent<{}, State> {
 
     return (
       <View style={styles.root}>
-        { this.state.scrollDirection !== 'down' &&
-          <View>
-            <TextInput
-              placeholder='Enter movie title'
-              onChangeText={this.handleSearchTextChange}
-              value={this.state.searchText}
-              style={styles.search}
-            />
-            <TouchableOpacity onPress={this.handleSearchPress}>
-              <Text style={styles.searchButton}>Search</Text>
-            </TouchableOpacity>
-          </View>
-        }
+        <View>
+          <TextInput
+            placeholder='Enter movie title'
+            onChangeText={this.handleSearchTextChange}
+            value={this.state.searchText}
+            style={styles.search}
+          />
+          <TouchableOpacity onPress={this.handleSearchPress}>
+            <Text style={styles.searchButton}>Search</Text>
+          </TouchableOpacity>
+        </View>
 
 
         { Boolean(totalResults) &&
@@ -195,7 +186,6 @@ export default class Home extends React.PureComponent<{}, State> {
             onEndReachedThreshold={0.5}
             onEndReached={this.loadMoreVideos}
             ListFooterComponent={this.renderListFooter}
-            onScroll={this.handleListOnScroll}
           />
         }
 
