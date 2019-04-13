@@ -2,6 +2,7 @@ import * as React from 'react'
 import {
   View,
   Text,
+  TouchableOpacity,
   Image
 } from 'react-native';
 import { Video } from './types';
@@ -10,12 +11,24 @@ import { Video } from './types';
 import NAImage from '../../images/not_available.png';
 
 import styles from './VideoCard.styles';
+import { NavigationInjectedProps } from 'react-navigation';
 
 interface Props {
   video: Video;
 }
 
-export default class VideoCard extends React.PureComponent<Props> {
+export default class VideoCard extends React.PureComponent<Props & NavigationInjectedProps> {
+
+  navigateToMovieInfo: () => void = () => {
+    this.props.navigation.navigate(
+      'Info',
+      {
+        title: this.props.video.Title,
+        imdbId: this.props.video.imdbID,
+      }
+    );
+  };
+
   render() {
     const {
       Title,
@@ -51,6 +64,10 @@ export default class VideoCard extends React.PureComponent<Props> {
             <Text style={styles.label}>type:</Text>
             <Text style={styles.type}>{ Type }</Text>
           </View>
+
+          <TouchableOpacity onPress={this.navigateToMovieInfo}>
+            <Text>More info</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );

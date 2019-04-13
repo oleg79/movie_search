@@ -2,24 +2,21 @@ import * as React from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   Text,
   TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
 import Config from 'react-native-config';
-import axios from 'axios';
+import {NavigationInjectedProps} from 'react-navigation';
 
+import axios from 'axios';
 import { SearchParamsContext } from '../../providers/SearchParamsProvider';
+
 import {Video, VideoCard} from '../../components/VideoCard';
 
 import { isSuccessResponse, isFailResponse } from './helpers';
-
 import styles from './Home.styles'
-
-type ScrollDirection = 'up' | 'down' | null;
 
 interface State {
   page: number;
@@ -43,7 +40,7 @@ export const defaultState: State = {
   totalResults: 0,
 };
 
-export default class Home extends React.PureComponent<{}, State> {
+export default class Home extends React.PureComponent<NavigationInjectedProps, State> {
   static contextType = SearchParamsContext;
   context!: React.ContextType<typeof SearchParamsContext>;
 
@@ -90,7 +87,6 @@ export default class Home extends React.PureComponent<{}, State> {
 
     try {
       const { data: response } = await axios.get(uri);
-      console.log(response);
       if (isSuccessResponse(response)) {
         this.setState(() => ({
           data: page === 1 ? response.Search : [ ...this.state.data, ...response.Search ],
@@ -113,7 +109,7 @@ export default class Home extends React.PureComponent<{}, State> {
 
   };
 
-  renderItem = ({item}:{item: Video}) => <VideoCard video={item}/>;
+  renderItem = ({item}:{item: Video}) => <VideoCard video={item} navigation={this.props.navigation}/>;
 
   keyExtractor: (item: Video) => string = (item: Video) => item.imdbID;
 

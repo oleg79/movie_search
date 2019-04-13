@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { View, Text } from 'react-native';
 import {
   createDrawerNavigator,
   createStackNavigator,
@@ -9,7 +10,7 @@ import Icon from 'react-native-vector-icons/Feather';
 
 import SearchParamsProvider from './src/providers/SearchParamsProvider'
 
-import { Home } from './src/screens';
+import { Home, Info } from './src/screens';
 import { SearchParams } from './src/components';
 
 export default class App extends React.Component<object> {
@@ -30,10 +31,15 @@ const DrawerNavigator = createDrawerNavigator({
 });
 
 const StackNavigator = createStackNavigator({
-  DrawerNavigator
+  DrawerNavigator: {
+    screen: DrawerNavigator,
+    navigationOptions: {
+      headerTitle: 'Movies search',
+    }
+  },
+  Info,
 }, {
   defaultNavigationOptions: ({ navigation }) => ({
-    headerTitle: 'Movies search',
     headerRight: (
       <Icon
         name='menu'
@@ -42,7 +48,7 @@ const StackNavigator = createStackNavigator({
         style={{ paddingRight: 10 }}
       />
     )
-  })
+  }),
 });
 
 const AppContainer = createAppContainer(StackNavigator);
