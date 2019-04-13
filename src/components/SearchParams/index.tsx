@@ -72,7 +72,7 @@ export default class SearchParams extends React.PureComponent<object, State> {
             maximumValue={2019}
             step={1}
             value={this.context.year}
-            onSlidingComplete={year => this.context.setYear(year)}
+            onSlidingComplete={this.context.setYear}
             onValueChange={this.handleValueChange}
             minimumTrackTintColor="#e53935"
             maximumTrackTintColor="#e53935"

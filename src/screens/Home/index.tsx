@@ -55,7 +55,8 @@ export default class Home extends React.PureComponent<{}, State> {
   handleSearchTextChange: (searchText: string) => void = searchText => {
     this.setState({
       searchText,
-      showEmptySearchWarning: false
+      showEmptySearchWarning: false,
+      error: null,
     });
   };
 
@@ -180,25 +181,27 @@ export default class Home extends React.PureComponent<{}, State> {
         }
 
         { showEmptySearchWarning &&
-          <View>
-            <Text>Please enter the title</Text>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>Please enter a title</Text>
           </View>
         }
 
-        <FlatList
-          data={data}
-          renderItem={this.renderItem}
-          keyExtractor={this.keyExtractor}
-          initialNumToRender={3}
-          onEndReachedThreshold={0.5}
-          onEndReached={this.loadMoreVideos}
-          ListFooterComponent={this.renderListFooter}
-          onScroll={this.handleListOnScroll}
-        />
+        {!error &&
+          <FlatList
+            data={data}
+            renderItem={this.renderItem}
+            keyExtractor={this.keyExtractor}
+            initialNumToRender={3}
+            onEndReachedThreshold={0.5}
+            onEndReached={this.loadMoreVideos}
+            ListFooterComponent={this.renderListFooter}
+            onScroll={this.handleListOnScroll}
+          />
+        }
 
         { error &&
-          <View>
-            <Text>{ error }</Text>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{ error }</Text>
           </View>
         }
       </View>

@@ -33,4 +33,18 @@ export default StyleSheet.create({
     paddingVertical: 10,
     color: '#37474f',
   },
+
+  errorContainer: {
+    width: '90%',
+    alignSelf: 'center',
+    marginTop: 15,
+    backgroundColor: '#ffeb3b',
+    paddingVertical: 10,
+  },
+
+  errorText: {
+    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
 });
