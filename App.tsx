@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  createBottomTabNavigator,
   createDrawerNavigator,
   createStackNavigator,
   createAppContainer,
@@ -10,8 +11,9 @@ import Icon from 'react-native-vector-icons/Feather';
 
 import SearchParamsProvider from './src/providers/SearchParamsProvider'
 
-import { Home, Info } from './src/screens';
+import { Home, Info, Favorites } from './src/screens';
 import { SearchParams } from './src/components';
+import {View, Text} from "react-native";
 
 export default class App extends React.Component<object> {
   render() {
@@ -48,4 +50,10 @@ const StackNavigator = createStackNavigator({
   Info,
 });
 
-const AppContainer = createAppContainer(StackNavigator);
+
+const BottomNavigator = createBottomTabNavigator({
+  Home: { screen: StackNavigator },
+  Favorites,
+});
+
+const AppContainer = createAppContainer(BottomNavigator);
