@@ -1,8 +1,16 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
+import {
+  Image,
+  ScrollView,
+  Text,
+  View
+} from 'react-native';
 import {NavigationInjectedProps, NavigationScreenProps} from 'react-navigation';
 import Config from 'react-native-config';
 import axios from 'axios';
+
+// @ts-ignore
+import NAImage from '../../images/not_available.png';
 
 interface VideoData {
   Actors: string;
@@ -56,12 +64,36 @@ export default class Info extends React.PureComponent<NavigationInjectedProps, S
 
   render() {
     const { data } = this.state;
-    return (
-      <View>
-        { isVideoData(data) &&
+    return isVideoData(data) ? (
+      <ScrollView>
+        <Image
+          source={{ uri: data.Poster }}
+          defaultSource={NAImage}
+          style={{
+            width: 200,
+            height: 300,
+          }}
+        />
+        <View>
+          <Text>Actors:</Text>
           <Text>{ data.Actors }</Text>
-        }
-      </View>
-    );
+        </View>
+
+        <View>
+          <Text>Director:</Text>
+          <Text>{ data.Director }</Text>
+        </View>
+
+        <View>
+          <Text>Imdb rating:</Text>
+          <Text>{ data.imdbRating }</Text>
+        </View>
+
+        <View>
+          <Text>Plot:</Text>
+          <Text>{ data.Plot }</Text>
+        </View>
+      </ScrollView>
+    ): null;
   }
 }

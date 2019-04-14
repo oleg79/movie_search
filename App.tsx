@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { View, Text } from 'react-native';
+import * as React from 'react';
 import {
   createDrawerNavigator,
   createStackNavigator,
-  createAppContainer
+  createAppContainer,
+  NavigationInjectedProps
 } from 'react-navigation';
 
 import Icon from 'react-native-vector-icons/Feather';
@@ -33,22 +33,19 @@ const DrawerNavigator = createDrawerNavigator({
 const StackNavigator = createStackNavigator({
   DrawerNavigator: {
     screen: DrawerNavigator,
-    navigationOptions: {
+    navigationOptions: ({ navigation }: NavigationInjectedProps) => ({
       headerTitle: 'Movies search',
-    }
+      headerRight: (
+        <Icon
+          name='menu'
+          size={40}
+          onPress={navigation.toggleDrawer}
+          style={{ paddingRight: 10 }}
+        />
+      )
+    })
   },
   Info,
-}, {
-  defaultNavigationOptions: ({ navigation }) => ({
-    headerRight: (
-      <Icon
-        name='menu'
-        size={40}
-        onPress={navigation.toggleDrawer}
-        style={{ paddingRight: 10 }}
-      />
-    )
-  }),
 });
 
 const AppContainer = createAppContainer(StackNavigator);
